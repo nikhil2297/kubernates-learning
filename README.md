@@ -151,6 +151,8 @@ spec:
 
 3. **View the pods created by the ReplicaSet:** `kubectl get pods`
 
-4. **Update the number of replicas:** Modify the replicas field in the YAML file, then run
+4. **Scale up or scale down the replicas without editing aml file:** `kubectl scale replicaset <replicaset name> --replicas=<number of replica>` 
+
+5. **Update the number of replicas:** Modify the replicas field in the YAML file, then run
 
 `kubectl replace -f replicaset.yaml`
