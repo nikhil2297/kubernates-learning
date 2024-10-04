@@ -145,11 +145,11 @@ spec:
 
 ### Commands to Manage ReplicaSets
 
-1. **Create a ReplicaSet: ** `kubectl apply -f replicaset.yaml`
+1. **Create a ReplicaSet:** `kubectl apply -f replicaset.yaml`
 
-2. **Get a list of ReplicaSets: ** `kubectl get replicaset`
+2. **Get a list of ReplicaSets:** `kubectl get replicaset`
 
-3. **View the pods created by the ReplicaSet: ** `kubectl get pods`
+3. **View the pods created by the ReplicaSet:** `kubectl get pods`
 
 4. **Update the number of replicas:** Modify the replicas field in the YAML file, then run
 
