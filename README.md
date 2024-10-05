@@ -95,6 +95,8 @@ Here are some useful `kubectl` commands for working with pods:
 - **kubectl get pod [pod-name] -o yaml**: Retrieves the YAML file for a specific pod.
 - **kubectl create -f pod [yaml-file-name]**: Run a pod with a specified details in yaml file.
 
+## YAML Indentation
+**Important Note:** YAML files should use spaces instead of tabs for indentation, as tabs can cause issues with conversion to JSON.
 
 ## ReplicaSet in Kubernetes
 
@@ -156,3 +158,138 @@ spec:
 5. **Update the number of replicas:** Modify the replicas field in the YAML file, then run
 
 `kubectl replace -f replicaset.yaml`
+
+
+## Deployment in Kubernets
+
+A deployment in Kubernetes is responsible for managing application updates, scaling, and ensuring that the application is always available. You can update pods sequentially, rolling out new changes while ensuring high availability.
+
+### Creating a Deployment
+
+To create a deployment, we need to define a YAML configuration file similar to the one for a replica set. However, in a deployment YAML file, we need to change two things:
+
+- **API Version:** `apps/v1`
+- **Kind:** `Deplyment`
+
+ Here’s an example of a deployment YAML file:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: example-app
+  template:
+    metadata:
+      labels:
+        app: example-app
+    spec:
+      containers:
+      - name: example-container
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+```
+
+### Commands to Manage Deployment
+
+1. **Create Deployment:** `kubectl create -f deployment-definition.yaml`
+2. **Get List of Deployments:** `kubectl get deployments`
+3. **Update Deployment**
+     - Update the image of your deployment by modifying the YAML file and applying the changes: `kubectl apply -f deployment-definition.yaml`
+     - Alternatively, without modifying the YAML file: `kubectl set image deployment/example-deployment example-container=nginx:1.16.0`
+4. **Rollback to Previous Version:** `kubectl rollout undo deployment/example-deployment`
+5. **Pause and Resume Deployment** `kubectl rollout pause deployment/example-deployment`
+6. **To resume** `kubectl rollout resume deployment/example-deployment`
+
+### Key Concepts of Deployment
+
+- **Rolling Updates :** Update pods sequentially to ensure high availability. This is useful when you need to release features without downtime.
+- **Pause and Resume :** First Pause all the pods and update the pods with new changes then resume the pods.
+
+## Kubernetes Services
+
+Services in Kubernetes help connect different pods, allowing them to communicate. A service provides an abstraction to expose pods as a network service.
+
+### Types of Services
+
+1. **ClusterIP**
+    - Default type.
+    - Used for internal communication between pods (e.g., Flask to Redis).
+    - Not exposed to the outside world.
+
+2. **NodePort**
+     - Exposes the service on each node’s IP at a static port.
+     - Can be accessed externally via NodeIP:NodePort.
+     - Used to expose a web application, e.g., an Angular app.
+  
+3. **LoadBalancer**   
+    - Exposes the service externally and automatically integrates with a cloud provider's load balancer.
+    - Distributes the load between multiple pods.
+
+#### ClusterIP Service Example
+
+When creating a Redis service (ClusterIP), it allows internal communication within the cluster, for example, a Python Flask pod connecting to a Redis pod.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    app: redis
+```
+
+#### NodePort Service Example
+
+NodePort exposes a service to the external world using a specific port. Here’s an example of an Angular app being exposed:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: angular-service
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30001
+  selector:
+    app: angular-app
+```
+
+#### LoadBalancer Service Example
+
+If you want to distribute load across multiple nodes or integrate cloud provider load balancers:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-loadbalancer-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: my-app
+```
+
+
+### Service Selector and Load Balancing
+
+The selector in the service definition ensures that traffic is routed to pods matching the label. If you have multiple pods with the same label, the service automatically balances traffic between them. Kubernetes uses a random algorithm to distribute traffic, but you can customize this behavior.
+
+
+  
